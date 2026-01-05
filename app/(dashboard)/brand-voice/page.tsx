@@ -174,7 +174,7 @@ export default function BrandVoicePage() {
             <CardHeader>
               <CardTitle>Brand Personality</CardTitle>
               <CardDescription>
-                How would you describe your brand's communication style?
+                How would you describe your brand&apos;s communication style?
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

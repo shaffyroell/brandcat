@@ -112,7 +112,7 @@ function CreatePostForm() {
         </Link>
         <h1 className="text-3xl font-bold">Create New Post</h1>
         <p className="text-muted-foreground mt-2">
-          Tell us what you want to write about, and we'll help you create content aligned with your brand
+          Tell us what you want to write about, and we&apos;ll help you create content aligned with your brand
         </p>
       </div>
 

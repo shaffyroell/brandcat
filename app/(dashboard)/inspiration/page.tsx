@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -167,11 +168,12 @@ export default function InspirationPage() {
                 <CardContent className="pt-6">
                   <div className="flex gap-4">
                     {article.imageUrl && (
-                      <div className="flex-shrink-0 w-32 h-32">
-                        <img
+                      <div className="flex-shrink-0 w-32 h-32 relative">
+                        <Image
                           src={article.imageUrl}
                           alt={article.title}
-                          className="w-full h-full object-cover rounded"
+                          fill
+                          className="object-cover rounded"
                         />
                       </div>
                     )}
