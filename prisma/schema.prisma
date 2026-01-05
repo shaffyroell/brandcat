@@ -1,0 +1,159 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  BRAND_OWNER
+  USER
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+}
+
+model Brand {
+  id          String   @id @default(cuid())
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users       User[]
+  brandVoice  BrandVoice?
+  posts       Post[]
+  inspiration Inspiration[]
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String
+  role          Role      @default(USER)
+  brandId       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  brand         Brand?    @relation(fields: [brandId], references: [id])
+  personalVoice PersonalVoice?
+  posts         Post[]
+}
+
+model BrandVoice {
+  id                String   @id @default(cuid())
+  brandId           String   @unique
+
+  // Brand voice attributes
+  tone              String[] // e.g., ["professional", "friendly", "humorous"]
+  humor             String?  // Level of humor: none, subtle, playful, etc.
+  formality         String?  // formal, casual, conversational
+  vocabulary        String?  // simple, moderate, advanced
+
+  // Brand guidelines
+  doWords           String[] // Words/phrases to use
+  dontWords         String[] // Words/phrases to avoid
+
+  // Brand documents and references
+  documents         Json?    // Array of uploaded document references
+  examplePosts      String[] // Example posts that represent the brand
+
+  // Additional attributes
+  targetAudience    String?
+  brandValues       String[]
+  keyMessages       String[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  brand             Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+}
+
+model PersonalVoice {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+
+  // Personal attributes
+  expertise         String[] // Areas of expertise
+  interests         String[]
+  writingStyle      String?  // descriptive, concise, storytelling, etc.
+  preferredTopics   String[]
+
+  // Voice preferences
+  tone              String[] // personal tone preferences
+  perspective       String?  // first-person, third-person, etc.
+
+  // Background
+  bio               String?
+  jobTitle          String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Post {
+  id                String     @id @default(cuid())
+  userId            String
+  brandId           String?
+
+  // Post content
+  title             String?
+  content           String     @db.Text
+  topic             String?    // What the post is about
+
+  // Post settings
+  length            String?    // short, medium, long
+  style             String?    // Professional, casual, etc.
+  status            PostStatus @default(DRAFT)
+
+  // Context and inspiration
+  contextUrl        String?    // URL of another post for context
+  inspirationId     String?    // Link to inspiration article
+
+  // Publishing
+  publishDate       DateTime?
+  publishedAt       DateTime?
+
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brand             Brand?     @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  inspiration       Inspiration? @relation(fields: [inspirationId], references: [id], onDelete: SetNull)
+}
+
+model Inspiration {
+  id                String   @id @default(cuid())
+  brandId           String
+
+  // Article details
+  title             String
+  description       String?  @db.Text
+  url               String
+  source            String?  // RSS feed source
+
+  // Relevance
+  relevanceScore    Int      @default(5) // 1-10 scale
+
+  // Metadata
+  publishedDate     DateTime?
+  imageUrl          String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  brand             Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  posts             Post[]
+
+  @@unique([brandId, url])
+}
