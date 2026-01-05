@@ -1,30 +1,13 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useMockSession } from "@/components/providers/session-provider";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, Lightbulb, Users, Settings, Plus } from "lucide-react";
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
-
-  if (status === "loading") {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
-
-  if (!session) {
-    return null;
-  }
+  const session = useMockSession();
 
   const isBrandOwner = session.user.role === "BRAND_OWNER";
 
