@@ -79,9 +79,30 @@ export default function LoginPage() {
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
+
+          <div className="mt-4">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-muted-foreground">Or</span>
+              </div>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full mt-4"
+            onClick={() => router.push("/dashboard")}
+          >
+            Skip Login (Demo Mode)
+          </Button>
+
           <div className="mt-4 text-center text-sm text-muted-foreground">
-            <strong>Demo Mode:</strong> Enter any email/password to create an account.<br />
-            First user becomes Brand Owner, others become regular users.
+            <strong>Demo Mode:</strong> Skip login to explore the UI.<br />
+            Database features require authentication setup.
           </div>
         </CardContent>
       </Card>
