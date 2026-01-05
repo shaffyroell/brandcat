@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
 
-        const user = await prisma.user.findUnique({
+        let user = await prisma.user.findUnique({
           where: {
             email: credentials.email
           },
@@ -27,7 +27,49 @@ export const authOptions: NextAuthOptions = {
           }
         });
 
-        if (!user || !user.password) {
+        // Auto-create user if doesn't exist (for demo purposes)
+        if (!user) {
+          const hashedPassword = await bcrypt.hash(credentials.password, 10);
+
+          // Check if this is the first user (make them brand owner)
+          const userCount = await prisma.user.count();
+          const isFirstUser = userCount === 0;
+
+          // Create brand for first user
+          let brandId = null;
+          if (isFirstUser) {
+            const brand = await prisma.brand.create({
+              data: {
+                name: "My Brand",
+              },
+            });
+            brandId = brand.id;
+          }
+
+          user = await prisma.user.create({
+            data: {
+              email: credentials.email,
+              password: hashedPassword,
+              name: credentials.email.split('@')[0],
+              role: isFirstUser ? "BRAND_OWNER" : "USER",
+              brandId: brandId,
+            },
+            include: {
+              brand: true
+            }
+          });
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            brandId: user.brandId,
+          };
+        }
+
+        // Verify existing user password
+        if (!user.password) {
           throw new Error("Invalid credentials");
         }
 

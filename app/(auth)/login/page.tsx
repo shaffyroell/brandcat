@@ -80,7 +80,8 @@ export default function LoginPage() {
             </Button>
           </form>
           <div className="mt-4 text-center text-sm text-muted-foreground">
-            Demo: Use any email/password combination to create an account
+            <strong>Demo Mode:</strong> Enter any email/password to create an account.<br />
+            First user becomes Brand Owner, others become regular users.
           </div>
         </CardContent>
       </Card>
