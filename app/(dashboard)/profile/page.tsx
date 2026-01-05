@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useMockSession } from "@/components/providers/session-provider";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +23,7 @@ interface PersonalVoiceData {
 }
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
+  const session = useMockSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [newExpertise, setNewExpertise] = useState("");
@@ -42,9 +42,6 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
   }, [status, router]);
 
   const handleToneToggle = (tone: string) => {
@@ -97,9 +94,6 @@ export default function ProfilePage() {
     }
   };
 
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
 
   const toneOptions = ["Professional", "Friendly", "Analytical", "Creative", "Direct", "Empathetic"];
 

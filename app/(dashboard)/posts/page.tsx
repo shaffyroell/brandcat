@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useMockSession } from "@/components/providers/session-provider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -27,16 +27,13 @@ interface Post {
 }
 
 export default function PostsPage() {
-  const { data: session, status } = useSession();
+  const session = useMockSession();
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("table");
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    } else if (status === "authenticated") {
       fetchPosts();
     }
   }, [status, router]);
@@ -74,7 +71,7 @@ export default function PostsPage() {
     }
   };
 
-  if (status === "loading" || loading) {
+  if (loading) {
     return <div>Loading...</div>;
   }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useMockSession } from "@/components/providers/session-provider";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ interface User {
 }
 
 export default function UsersPage() {
-  const { data: session, status } = useSession();
+  const session = useMockSession();
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,9 +33,6 @@ export default function UsersPage() {
   });
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    } else if (status === "authenticated") {
       if (session.user.role !== "BRAND_OWNER") {
         router.push("/dashboard");
       } else {
@@ -101,7 +98,7 @@ export default function UsersPage() {
     }
   };
 
-  if (status === "loading" || loading) {
+  if (loading) {
     return <div>Loading...</div>;
   }
 

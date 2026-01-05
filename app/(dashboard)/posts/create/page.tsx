@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSession } from "next-auth/react";
+import { useMockSession } from "@/components/providers/session-provider";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import { Sparkles, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 function CreatePostForm() {
-  const { data: session, status } = useSession();
+  const session = useMockSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const inspirationId = searchParams.get('inspiration');
@@ -30,9 +30,6 @@ function CreatePostForm() {
   });
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
   }, [status, router]);
 
   const handleGenerate = async () => {
@@ -99,9 +96,6 @@ function CreatePostForm() {
     }
   };
 
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="max-w-4xl mx-auto">

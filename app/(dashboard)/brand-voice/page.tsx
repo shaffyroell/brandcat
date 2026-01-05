@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useState } from "react";
+import { useMockSession } from "@/components/providers/session-provider";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +25,7 @@ interface BrandVoiceData {
 }
 
 export default function BrandVoicePage() {
-  const { data: session, status } = useSession();
+  const session = useMockSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -45,15 +45,6 @@ export default function BrandVoicePage() {
     brandValues: [],
     keyMessages: [],
   });
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-    if (session?.user.role !== "BRAND_OWNER") {
-      router.push("/dashboard");
-    }
-  }, [status, session, router]);
 
   const handleToneToggle = (tone: string) => {
     setFormData(prev => ({
@@ -104,10 +95,6 @@ export default function BrandVoicePage() {
       setLoading(false);
     }
   };
-
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
 
   const toneOptions = ["Professional", "Friendly", "Humorous", "Authoritative", "Casual", "Empathetic"];
 

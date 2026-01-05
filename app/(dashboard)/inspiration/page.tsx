@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useMockSession } from "@/components/providers/session-provider";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -24,7 +24,7 @@ interface InspirationArticle {
 }
 
 export default function InspirationPage() {
-  const { data: session, status } = useSession();
+  const session = useMockSession();
   const router = useRouter();
   const [articles, setArticles] = useState<InspirationArticle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,9 +32,6 @@ export default function InspirationPage() {
   const [rssUrl, setRssUrl] = useState("");
 
   useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    } else if (status === "authenticated") {
       fetchArticles();
     }
   }, [status, router]);
@@ -101,7 +98,7 @@ export default function InspirationPage() {
     return "text-red-600";
   };
 
-  if (status === "loading" || loading) {
+  if (loading) {
     return <div>Loading...</div>;
   }
 
