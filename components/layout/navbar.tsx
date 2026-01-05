@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession, signOut } from "next-auth/react";
+import { useMockSession } from "@/components/providers/session-provider";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 export function Navbar() {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const session = useMockSession();
 
   if (!session) return null;
 
@@ -72,7 +72,7 @@ export function Navbar() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => signOut({ callbackUrl: "/login" })}
+              onClick={() => alert("Demo mode - sign out disabled")}
             >
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
