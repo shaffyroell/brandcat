@@ -14,6 +14,132 @@ export async function GET() {
     await prisma.$connect();
     console.log('✅ Database connected');
 
+    // Create tables using raw SQL
+    console.log('📋 Creating database schema...');
+
+    // Create enums
+    await prisma.$executeRawUnsafe(`
+      DO $$ BEGIN
+        CREATE TYPE "Role" AS ENUM ('BRAND_OWNER', 'USER');
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `);
+
+    await prisma.$executeRawUnsafe(`
+      DO $$ BEGIN
+        CREATE TYPE "PostStatus" AS ENUM ('DRAFT', 'SCHEDULED', 'PUBLISHED');
+      EXCEPTION
+        WHEN duplicate_object THEN null;
+      END $$;
+    `);
+
+    // Create tables
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "Brand" (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL
+      );
+    `);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "User" (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        name TEXT,
+        password TEXT NOT NULL,
+        role "Role" NOT NULL DEFAULT 'USER',
+        "brandId" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        CONSTRAINT "User_brandId_fkey" FOREIGN KEY ("brandId") REFERENCES "Brand"(id) ON DELETE SET NULL ON UPDATE CASCADE
+      );
+    `);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "BrandVoice" (
+        id TEXT PRIMARY KEY,
+        "brandId" TEXT UNIQUE NOT NULL,
+        tone TEXT[] NOT NULL,
+        humor TEXT,
+        formality TEXT,
+        vocabulary TEXT,
+        "doWords" TEXT[] NOT NULL,
+        "dontWords" TEXT[] NOT NULL,
+        documents JSONB,
+        "examplePosts" TEXT[] NOT NULL,
+        "targetAudience" TEXT,
+        "brandValues" TEXT[] NOT NULL,
+        "keyMessages" TEXT[] NOT NULL,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        CONSTRAINT "BrandVoice_brandId_fkey" FOREIGN KEY ("brandId") REFERENCES "Brand"(id) ON DELETE CASCADE ON UPDATE CASCADE
+      );
+    `);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "PersonalVoice" (
+        id TEXT PRIMARY KEY,
+        "userId" TEXT UNIQUE NOT NULL,
+        expertise TEXT[] NOT NULL,
+        interests TEXT[] NOT NULL,
+        "writingStyle" TEXT,
+        "preferredTopics" TEXT[] NOT NULL,
+        tone TEXT[] NOT NULL,
+        perspective TEXT,
+        bio TEXT,
+        "jobTitle" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        CONSTRAINT "PersonalVoice_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"(id) ON DELETE CASCADE ON UPDATE CASCADE
+      );
+    `);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "Inspiration" (
+        id TEXT PRIMARY KEY,
+        "brandId" TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        url TEXT NOT NULL,
+        source TEXT,
+        "relevanceScore" INTEGER NOT NULL DEFAULT 5,
+        "publishedDate" TIMESTAMP(3),
+        "imageUrl" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        CONSTRAINT "Inspiration_brandId_fkey" FOREIGN KEY ("brandId") REFERENCES "Brand"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        CONSTRAINT "Inspiration_brandId_url_key" UNIQUE ("brandId", url)
+      );
+    `);
+
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "Post" (
+        id TEXT PRIMARY KEY,
+        "userId" TEXT NOT NULL,
+        "brandId" TEXT,
+        title TEXT,
+        content TEXT NOT NULL,
+        topic TEXT,
+        length TEXT,
+        style TEXT,
+        status "PostStatus" NOT NULL DEFAULT 'DRAFT',
+        "contextUrl" TEXT,
+        "inspirationId" TEXT,
+        "publishDate" TIMESTAMP(3),
+        "publishedAt" TIMESTAMP(3),
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL,
+        CONSTRAINT "Post_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"(id) ON DELETE CASCADE ON UPDATE CASCADE,
+        CONSTRAINT "Post_brandId_fkey" FOREIGN KEY ("brandId") REFERENCES "Brand"(id) ON DELETE SET NULL ON UPDATE CASCADE,
+        CONSTRAINT "Post_inspirationId_fkey" FOREIGN KEY ("inspirationId") REFERENCES "Inspiration"(id) ON DELETE SET NULL ON UPDATE CASCADE
+      );
+    `);
+
+    console.log('✅ Database schema created');
+
     // Create Brand
     const brand = await prisma.brand.upsert({
       where: { id: 'demo-brand-id' },
