@@ -32,9 +32,8 @@ export default function InspirationPage() {
   const [rssUrl, setRssUrl] = useState("");
 
   useEffect(() => {
-      fetchArticles();
-    }
-  }, [status, router]);
+    fetchArticles();
+  }, []);
 
   const fetchArticles = async () => {
     try {

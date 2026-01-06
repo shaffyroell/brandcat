@@ -33,13 +33,12 @@ export default function UsersPage() {
   });
 
   useEffect(() => {
-      if (session.user.role !== "BRAND_OWNER") {
-        router.push("/dashboard");
-      } else {
-        fetchUsers();
-      }
+    if (session.user.role !== "BRAND_OWNER") {
+      router.push("/dashboard");
+    } else {
+      fetchUsers();
     }
-  }, [status, session, router]);
+  }, []);
 
   const fetchUsers = async () => {
     try {

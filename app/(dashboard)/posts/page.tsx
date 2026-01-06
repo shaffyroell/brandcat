@@ -34,9 +34,8 @@ export default function PostsPage() {
   const [activeTab, setActiveTab] = useState("table");
 
   useEffect(() => {
-      fetchPosts();
-    }
-  }, [status, router]);
+    fetchPosts();
+  }, []);
 
   const fetchPosts = async () => {
     try {
