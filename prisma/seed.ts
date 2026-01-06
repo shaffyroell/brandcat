@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, PostStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -200,7 +200,7 @@ But here's the thing: authenticity is key. Your audience can spot inauthenticity
 Ready to elevate your brand story? Let's create something remarkable together.`,
       length: 'medium',
       style: 'storytelling',
-      status: 'PUBLISHED',
+      status: PostStatus.PUBLISHED,
       publishDate: new Date('2026-01-04'),
       publishedAt: new Date('2026-01-04'),
     },
@@ -218,7 +218,7 @@ At Acme Design Co., we've seen how stripping away the unnecessary can reveal the
 The result? Brands that communicate clearly, resonate deeply, and stand the test of time.`,
       length: 'short',
       style: 'professional',
-      status: 'PUBLISHED',
+      status: PostStatus.PUBLISHED,
       publishDate: new Date('2026-01-03'),
       publishedAt: new Date('2026-01-03'),
     },
@@ -238,7 +238,7 @@ At Acme Design Co., we don't just pick colors that look good together. We select
 What emotions does your brand want to evoke? Let's explore that together.`,
       length: 'medium',
       style: 'educational',
-      status: 'SCHEDULED',
+      status: PostStatus.SCHEDULED,
       publishDate: new Date('2026-01-08'),
     },
     {
@@ -255,7 +255,7 @@ Consistency builds recognition. Recognition builds trust. Trust builds loyalty.
 Draft notes: Need to expand on practical implementation strategies and include case study examples.`,
       length: 'short',
       style: 'professional',
-      status: 'DRAFT',
+      status: PostStatus.DRAFT,
     },
   ];
 
